@@ -8,7 +8,25 @@ Usage:
 
 This Java program simulates the Game of Life. To use it, follow these steps:
 
-Compile the program using a Java compiler.
+Compile and run from the repository root (requires a JDK):
+
+```sh
+mkdir -p build
+javac -d build src/GameOfLife.java
+java -cp build GameOfLife
+```
+
+For a bundled example, enter `init` when asked for a filename, then a positive number of generations. Input files are resolved relative to `src/`.
+
+Run the dependency-free regression tests:
+
+```sh
+javac -Xlint:all -d build src/GameOfLife.java tests/GameOfLifeTest.java
+java -cp build GameOfLifeTest
+```
+
+Empty grids, uneven rows, and values other than `0` and `1` are rejected with an error instead of starting the simulation.
+
 Prepare a text file containing the initial state of the game grid. Each cell in the grid should be represented by a 0 or 1, indicating dead or alive, respectively. Use whitespace to separate cells, and ensure that each row has the same number of cells.
 Run the compiled program and provide the filename (without the extension) of the text file containing the initial state when prompted.
 Enter the number of generations for which you want to simulate the game.

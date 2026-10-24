@@ -47,31 +47,34 @@ public class GameOfLife {
     public static boolean[][] readInitialState(String filePath) {
 
 
-        try {
-            File file = new File(filePath);
-            Scanner fileScanner = new Scanner(file);
+        try (Scanner fileScanner = new Scanner(new File(filePath))) {
 
             // Use a list to store lines as we don't know the height yet
             List<String> lines = new ArrayList<>();
             while (fileScanner.hasNextLine()) {
                 lines.add(fileScanner.nextLine());
             }
-            // Close the scanner
-            fileScanner.close();
-            // Get the height and width of the grid
+            // Reject empty grids before the caller accesses the first row.
             int height = lines.size();
-            int width = 0;
-            if (height > 0) {
-                width = lines.get(0).split("\\s+").length; // Detect width from the first line
+            if (height == 0 || lines.get(0).trim().isEmpty()) {
+                System.err.println("The grid must contain at least one cell.");
+                return null;
             }
+            int width = lines.get(0).trim().split("\\s+").length;
 
-            // Now create the array with known dimensions
             boolean[][] initialState = new boolean[height][width];
-            // Parse the lines and populate the array
             for (int i = 0; i < height; i++) {
-                String[] values = lines.get(i).split("\\s+");  // Split by whitespace
+                String[] values = lines.get(i).trim().split("\\s+");
+                if (values.length != width) {
+                    System.err.println("All grid rows must have the same number of cells.");
+                    return null;
+                }
                 for (int j = 0; j < width; j++) {
-                    initialState[i][j] = Integer.parseInt(values[j]) == 1;
+                    if (!values[j].equals("0") && !values[j].equals("1")) {
+                        System.err.println("Invalid data format in the file. Expecting 0 or 1.");
+                        return null;
+                    }
+                    initialState[i][j] = values[j].equals("1");
                 }
             }
             System.out.println("Initial state loaded from " + filePath);
@@ -81,10 +84,6 @@ public class GameOfLife {
             // FileNotFoundException: file not found
         } catch (FileNotFoundException e) {
             System.err.println("File not found: " + filePath);
-            return null;
-            // NumberFormatException: invalid data format
-        } catch (NumberFormatException e) {
-            System.err.println("Invalid data format in the file. Expecting 0 or 1.");
             return null;
         }
     }
